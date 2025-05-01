@@ -2,7 +2,7 @@ import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
 
 export type CanvasMessageType = {
   type: "canvas";
-  canvas: OffscreenCanvas;
+  offscreenCanvas: OffscreenCanvas;
 }
 
 export type FrameMessageType = {
@@ -20,7 +20,7 @@ export type TimestampMessageType = {
 
 export type CommandMessageType = {
   type: "command";
-  command: "play" | "stop";
+  command: "play" | "stop" | "clear";
 }
 
 export type WorkerMessageType = CanvasMessageType | FrameMessageType | TimestampMessageType | CommandMessageType
