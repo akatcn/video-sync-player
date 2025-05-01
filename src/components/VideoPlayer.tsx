@@ -5,32 +5,8 @@ import { getVideoFrameInfo } from "@utils/mp4BoxUtils";
 import { ChangeEvent, useRef, useState } from "react";
 import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
 import { PlayStatusEnum } from "@/constants/PlayStatusEnum";
-import PlayerWorker from "@/workers/playerWorker?worker&url"
-
-// todo: 싱크 맞추기 Hook(useSyncTime)으로 옮길 것
-const getTimestamp = async () => {
-  const requestAt = performance.now()
-  /* --------------------- */
-  const response = await fetch(`http://localhost:3000/time`);  // todo: 에러 핸들링
-  const body = await response.json();  // todo: response 타입 정의
-  const { timeStamp } = body
-  const tServer = timeStamp
-  /* --------------------- */
-  const receivedAt = performance.now()
-
-  // 임시 데이터
-  return {
-    tServer,
-    timeOrigin: performance.timeOrigin,
-    receivedAt,
-    rtt: receivedAt - requestAt
-  }
-}
-
-// todo: 싱크 맞추기 Hook(useSyncTime)으로 옮길 것
-const getServerTime = (tServer: number, rtt: number) => {
-  return tServer + (rtt / 2)
-}
+import PlayerWorker from "@/workers/playerWorker?worker&url";
+import useSyncTime from "@hooks/useSyncTime";
 
 function VideoPlayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -39,7 +15,9 @@ function VideoPlayer() {
   const [isOffcanvasTransferred, setIsOffcanvasTransferred] = useState(false);
   const [isVideoFrameInfoAcked, setIsVideoFrameInfoAcked] = useState(false);
   const [isTimestampAcked, setIsTimestampAcked] = useState(false);
-  const { workerRef, willWorkerSurvive } = useWorker({
+  const isPlayable = isOffcanvasTransferred && isVideoFrameInfoAcked && isTimestampAcked;
+
+  const { workerRef, isWorkerReady } = useWorker({
     path: PlayerWorker,
     onmessage: (e) => {
       const msg = e.data as ReseponseMessageType
@@ -76,24 +54,8 @@ function VideoPlayer() {
       }
     }
   })
-  useOffscreen({ canvasRef, workerRef, willWorkerSurvive })
-
-  const isPlayable = isOffcanvasTransferred && isVideoFrameInfoAcked && isTimestampAcked;
-
-  // todo: interval을 두고 싱크 맞춰지도록 할 것(별도의 Hook(useSyncTime??) 정의)
-  const handleSyncClick = async () => {
-    const worker = workerRef.current;
-    if (!worker) { return }
-    const { tServer, timeOrigin, receivedAt, rtt } = await getTimestamp()
-    const estimatedServerTime = getServerTime(tServer, rtt)
-    const msg: WorkerMessageType = {
-      type: "timestamp",
-      estimatedServerTime,
-      mainTimeOrigin: timeOrigin,
-      mainReceivedAt: receivedAt
-    }
-    worker.postMessage(msg)
-  }
+  useOffscreen({ canvasRef, workerRef, isWorkerReady })
+  useSyncTime({ workerRef, isWorkerReady })
 
   const handlePlayClick = () => {
     const msg: WorkerMessageType = {
@@ -107,13 +69,14 @@ function VideoPlayer() {
     const file = e.target.files?.[0];
     const worker = workerRef.current;
     if (!file || !worker) { return }
+    // todo: demuxing 실패에 대한 핸들링
     const { videoFrames, frameRate } = await getVideoFrameInfo(file);
     const msg: FrameMessageType = {
       type: "frame",
       videoFrames,
       frameRate
     };
-    // todo: videoFrames에 대해 deep clone 하지않고 transfer하는 방법을 고민할 것
+    // todo: videoFrames를 deep clone 하지않고 그대로 transfer하는 방법을 고민할 것
     worker.postMessage(msg);
     videoFrames.forEach(videoFrame => videoFrame.close())  // todo: videoFrames를 transfer할 경우 여기서 close하면 안될 것으로 예상된다
   }
@@ -121,7 +84,6 @@ function VideoPlayer() {
   return (
     <div>
       <canvas ref={canvasRef} style={{width: "100%", backgroundColor: "black"}} />
-      <button onClick={handleSyncClick}>SYNC</button>  {/* 싱크 맞추기 Hook(useSyncTime) 정의되면 제거할 것 */}
       <button onClick={handlePlayClick} disabled={!isPlayable}>{currentPlayStatus === PlayStatusEnum.PLAY ? "STOP" : "PLAY"}</button>
       <input type="file" accept="video/mp4" onChange={handleFileChange} />
     </div>
