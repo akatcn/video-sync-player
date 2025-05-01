@@ -4,7 +4,9 @@ import { CanvasMessageType, FrameMessageType, ReseponseMessageType, TimestampMes
 let canvas: CanvasMessageType["canvas"] | null = null;
 let videoFrames: FrameMessageType["videoFrames"] = [];
 let frameRate: FrameMessageType["frameRate"] | null = null;
-let timestamp: TimestampMessageType["timestamp"] | null = null;
+let estimatedServerTime: TimestampMessageType["estimatedServerTime"] | null = null;
+let mainTimeOrigin: TimestampMessageType["mainTimeOrigin"] | null = null;
+let mainReceivedAt: TimestampMessageType["mainReceivedAt"] | null = null;
 let requestID: number | null = null
 
 const sendMessage = (code: ResponseCodeEnum | ResponseCodeEnum) => {
@@ -12,13 +14,8 @@ const sendMessage = (code: ResponseCodeEnum | ResponseCodeEnum) => {
   self.postMessage(msg)
 }
 
-const drawing = () => {
-  // 프레임 인덱스 추정
-  // offcanvas drawing
-  requestID = self.requestAnimationFrame(drawing)
-}
-
-const play = () => {
+const draw = (time: DOMHighResTimeStamp) => {
+  // todo: 점검 로직 단순화 및 통합할 것
   if (canvas === null) {
     stop()
     sendMessage(ResponseCodeEnum.NO_CANVAS)
@@ -27,13 +24,44 @@ const play = () => {
     stop()
     sendMessage(ResponseCodeEnum.NO_FRAME_INFO)
     return
-  } else if (timestamp === null) {
+  } else if (estimatedServerTime === null || mainTimeOrigin === null || mainReceivedAt === null) {
     stop()
-    sendMessage(ResponseCodeEnum.NO_TIMESTAMP)
+    sendMessage(ResponseCodeEnum.NO_TIMESTAMP_INFO)
+    return
+  }
+
+  // 프레임 추정
+  const mainCurrentTime = time + (performance.timeOrigin - mainTimeOrigin);
+  const estimatedCurrentServerTime = estimatedServerTime + (mainCurrentTime - mainReceivedAt);
+  const estimatedFrameIndex = Math.floor((estimatedCurrentServerTime / 1_000) * frameRate) % videoFrames.length
+  const estimatedVideoFrame = videoFrames[estimatedFrameIndex]
+
+  // todo: draw 사이즈 canvas 사이즈에 맞출 것
+  canvas.width = estimatedVideoFrame.displayWidth;
+  canvas.height = estimatedVideoFrame.displayHeight
+  const ctx = canvas.getContext("2d");
+  ctx?.drawImage(estimatedVideoFrame, 0, 0);
+
+  requestID = self.requestAnimationFrame(draw)
+}
+
+const play = () => {
+  // todo: 점검 로직 단순화 및 통합할 것
+  if (canvas === null) {
+    stop()
+    sendMessage(ResponseCodeEnum.NO_CANVAS)
+    return
+  } else if (videoFrames === null || !frameRate) {
+    stop()
+    sendMessage(ResponseCodeEnum.NO_FRAME_INFO)
+    return
+  } else if (estimatedServerTime === null || mainTimeOrigin === null || mainReceivedAt === null) {
+    stop()
+    sendMessage(ResponseCodeEnum.NO_TIMESTAMP_INFO)
     return
   }
   sendMessage(ResponseCodeEnum.VIDEO_PLAY);
-  drawing()
+  self.requestAnimationFrame(draw)
 }
 
 const stop = () => {
@@ -56,7 +84,9 @@ self.onmessage = function (e) {
       sendMessage(ResponseCodeEnum.FRAME_INFO_ACKED);
       break
     case "timestamp":
-      timestamp = msg.timestamp;
+      estimatedServerTime = msg.estimatedServerTime;
+      mainTimeOrigin = msg.mainTimeOrigin;
+      mainReceivedAt = msg.mainReceivedAt;
       sendMessage(ResponseCodeEnum.TIMESTAMP_ACKED);
       break
     case "command": {

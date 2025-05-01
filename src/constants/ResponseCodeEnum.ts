@@ -7,7 +7,7 @@ export const ResponseCodeEnum = {
   VIDEO_STOP: "VIDEO_STOP",
   NO_CANVAS: "NO_CANVAS",
   NO_FRAME_INFO: "NO_FRAME_INFO",
-  NO_TIMESTAMP: "NO_TIMESTAMP"
+  NO_TIMESTAMP_INFO: "NO_TIMESTAMP_INFO"
 } as const
 
 export type ResponseCodeEnum = typeof ResponseCodeEnum[keyof typeof ResponseCodeEnum]

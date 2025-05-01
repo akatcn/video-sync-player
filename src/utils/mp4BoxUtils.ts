@@ -49,7 +49,7 @@ export const getVideoFrameInfo = async (file: File) => {
     mp4boxFile.start();
   }
 
-  mp4boxFile.onSamples = (id, ref, samples) => {
+  mp4boxFile.onSamples = (_id, _ref, samples) => {
     for (const sample of samples) {
       const chunk = new EncodedVideoChunk({
         type: sample.is_sync ? "key" : "delta",

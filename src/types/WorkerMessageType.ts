@@ -13,7 +13,9 @@ export type FrameMessageType = {
 
 export type TimestampMessageType = {
   type: "timestamp";
-  timestamp: number;
+  estimatedServerTime: number;
+  mainTimeOrigin: number;
+  mainReceivedAt: number
 }
 
 export type CommandMessageType = {
