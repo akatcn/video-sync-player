@@ -5,7 +5,7 @@ import { getVideoFrameInfo } from "@utils/mp4BoxUtils";
 import { ChangeEvent, useRef, useState } from "react";
 import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
 import { PlayStatusEnum } from "@/constants/PlayStatusEnum";
-import PlayerWorker from "@/worker/playerWorker?worker&url"
+import PlayerWorker from "@/workers/playerWorker?worker&url"
 
 // todo: 싱크 맞추기 Hook(useSyncTime)으로 옮길 것
 const getTimestamp = async () => {
