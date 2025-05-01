@@ -1,3 +1,5 @@
+import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
+
 export type CanvasMessageType = {
   type: "canvas";
   canvas: OffscreenCanvas;
@@ -20,3 +22,7 @@ export type CommandMessageType = {
 }
 
 export type WorkerMessageType = CanvasMessageType | FrameMessageType | TimestampMessageType | CommandMessageType
+
+export type ReseponseMessageType = {
+  code: ResponseCodeEnum | ResponseCodeEnum;
+}

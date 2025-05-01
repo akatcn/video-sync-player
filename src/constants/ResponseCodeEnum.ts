@@ -1,0 +1,13 @@
+export const ResponseCodeEnum = {
+  UNKNOWN: "UNKNOWN",
+  OFFCANVAS_ACKED: "OFFCANVAS_ACKED",
+  FRAME_INFO_ACKED: "FRAME_INFO_ACKED",
+  TIMESTAMP_ACKED: "TIMESTAMP_ACKED",
+  VIDEO_PLAY: "VIDEO_PLAY",
+  VIDEO_STOP: "VIDEO_STOP",
+  NO_CANVAS: "NO_CANVAS",
+  NO_FRAME_INFO: "NO_FRAME_INFO",
+  NO_TIMESTAMP: "NO_TIMESTAMP"
+} as const
+
+export type ResponseCodeEnum = typeof ResponseCodeEnum[keyof typeof ResponseCodeEnum]
