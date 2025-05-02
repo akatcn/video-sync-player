@@ -8,7 +8,7 @@ type UseOffscreenProps = {
 }
 
 // offscreen을 사용하면 워커에게 offscreen을 보내는 행위를 항상 수행하므로, 이 둘을 하나의 custom Hook에 묶었다
-const useOffscreen = ({ canvasRef, workerRef, isWorkerReady }: UseOffscreenProps) => {
+const useOffscreenCanvas = ({ canvasRef, workerRef, isWorkerReady }: UseOffscreenProps) => {
   const offscreenRef = useRef<OffscreenCanvas>(null);
   const isTransferredRef = useRef(false);
 
@@ -42,4 +42,4 @@ const useOffscreen = ({ canvasRef, workerRef, isWorkerReady }: UseOffscreenProps
   }, [workerRef, isWorkerReady])
 }
 
-export default useOffscreen
+export default useOffscreenCanvas

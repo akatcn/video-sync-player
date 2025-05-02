@@ -36,6 +36,7 @@ export const getVideoFrameInfo = async (file: File) => {
       throw new Error("video 트랙 찾을 수 없음")
     }
     const { nb_samples, timescale, duration } = videoTrack
+    // todo: nb_samples의 사이즈가 10,000을 초과할 경우 에러 발생시킬 것
     frameRate = (nb_samples * timescale) / duration;
     const config = {
       codec: videoTrack.codec.startsWith('vp08') ? 'vp8' : videoTrack.codec,

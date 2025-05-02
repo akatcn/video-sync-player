@@ -1,5 +1,5 @@
 import { FrameMessageType, ReseponseMessageType, WorkerMessageType } from "@/types/WorkerMessageType";
-import useOffscreen from "@hooks/useOffscreen";
+import useOffscreenCanvas from "@hooks/useOffscreenCanvas";
 import useWorker from "@hooks/useWorker";
 import { getVideoFrameInfo } from "@utils/mp4BoxUtils";
 import { ChangeEvent, useRef, useState } from "react";
@@ -11,7 +11,6 @@ import useSyncTime from "@hooks/useSyncTime";
 function VideoPlayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [currentPlayStatus, setCurrentPlayStatus] = useState<PlayStatusEnum>(PlayStatusEnum.STOP);
-  // todo: isOffcanvasTransferred, isVideoFrameInfoAcked, isTimestampAcked 과도한 것 같은데 하나의 state로 줄여도 될지 고민할 것
   const [isOffcanvasTransferred, setIsOffcanvasTransferred] = useState(false);
   const [isVideoFrameInfoAcked, setIsVideoFrameInfoAcked] = useState(false);
   const [isTimestampAcked, setIsTimestampAcked] = useState(false);
@@ -54,7 +53,7 @@ function VideoPlayer() {
       }
     }
   })
-  useOffscreen({ canvasRef, workerRef, isWorkerReady })
+  useOffscreenCanvas({ canvasRef, workerRef, isWorkerReady })
   useSyncTime({ workerRef, isWorkerReady })
 
   const handlePlayClick = () => {

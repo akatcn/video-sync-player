@@ -7,8 +7,8 @@ type UseSyncTimeProps = {
 }
 
 const BASE_INTERVAL_TIME = 60_000 * 3;  // 3분
-const OFFSET_MIN = 3_000;
-const OFFSET_MAX = 15_000;
+const OFFSET_MIN = 60_000 * 2;  // 2분
+const OFFSET_MAX = 60_000 * 12;  // 12분
 
 const useSyncTime = ({ workerRef, isWorkerReady }: UseSyncTimeProps) => {
   const getServerTime = async () => {

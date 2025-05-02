@@ -3,6 +3,7 @@ import { CanvasMessageType, FrameMessageType, ReseponseMessageType, TimestampMes
 
 // TypeScript가 self를 Window로 참조하지 않도록 설정
 declare let self: DedicatedWorkerGlobalScope;
+export {};
 
 let offscreenCanvas: CanvasMessageType["offscreenCanvas"] | null = null;
 let videoFrames: FrameMessageType["videoFrames"] = [];
