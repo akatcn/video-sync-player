@@ -112,6 +112,10 @@ self.onmessage = function (e) {
         case "clear":
           cleanUp()
           break
+        case "close":
+          cleanUp()
+          self.close()
+          break
       }
     }
     break

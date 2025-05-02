@@ -20,7 +20,7 @@ export type TimestampMessageType = {
 
 export type CommandMessageType = {
   type: "command";
-  command: "play" | "stop" | "clear";
+  command: "play" | "stop" | "clear" | "close";
 }
 
 export type WorkerMessageType = CanvasMessageType | FrameMessageType | TimestampMessageType | CommandMessageType
