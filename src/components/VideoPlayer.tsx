@@ -11,6 +11,7 @@ import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
 import { PlayStatusEnum } from "@/constants/PlayStatusEnum";
 import PlayerWorker from "@/workers/playerWorker?worker&url";
 import useSyncTime from "@hooks/useSyncTime";
+import { Button } from "@components/ui/button";
 
 function VideoPlayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -91,13 +92,10 @@ function VideoPlayer() {
 
   return (
     <div>
-      <canvas
-        ref={canvasRef}
-        style={{ width: "100%", backgroundColor: "black" }}
-      />
-      <button onClick={handlePlayClick} disabled={!isPlayable}>
+      <canvas ref={canvasRef} className="bg-black size-96" />
+      <Button onClick={handlePlayClick} disabled={!isPlayable}>
         {currentPlayStatus === PlayStatusEnum.PLAY ? "STOP" : "PLAY"}
-      </button>
+      </Button>
       <input type="file" accept="video/mp4" onChange={handleFileChange} />
     </div>
   );
