@@ -1,9 +1,7 @@
-import VideoPlayer from '@components/VideoPlayer'
+import VideoPlayer from "@components/VideoPlayer";
 
 function App() {
-  return (
-    <VideoPlayer />
-  )
+  return <VideoPlayer />;
 }
 
-export default App
+export default App;
