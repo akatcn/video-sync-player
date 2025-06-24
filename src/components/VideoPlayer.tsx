@@ -91,14 +91,15 @@ function VideoPlayer() {
   };
 
   return (
-    <div>
-      <canvas ref={canvasRef} className="bg-black size-96" />
-      <Button onClick={handlePlayClick} disabled={!isPlayable}>
-        {currentPlayStatus === PlayStatusEnum.PLAY ? "STOP" : "PLAY"}
-      </Button>
-      <input type="file" accept="video/mp4" onChange={handleFileChange} />
+    <div className="w-full flex">
+      <canvas ref={canvasRef} className="bg-black w-full h-full rounded-2xl" />
     </div>
   );
 }
 
 export default VideoPlayer;
+
+/* <Button onClick={handlePlayClick} disabled={!isPlayable}>
+    {currentPlayStatus === PlayStatusEnum.PLAY ? "STOP" : "PLAY"}
+  </Button>
+  <input type="file" accept="video/mp4" onChange={handleFileChange} /> */
