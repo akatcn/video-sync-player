@@ -1,27 +1,26 @@
 import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
 import {
-  CanvasMessageType,
-  FrameMessageType,
-  ReseponseMessageType,
-  TimestampMessageType,
-  WorkerMessageType,
-} from "@/types/WorkerMessageType";
+  CanvasMessage,
+  FrameMessage,
+  ReseponseMessage,
+  TimestampMessage,
+  WorkerMessage,
+} from "@/types/WorkerMessage.type";
 
 // TypeScript가 self를 Window로 참조하지 않도록 설정
 declare let self: DedicatedWorkerGlobalScope;
 export {};
 
-let offscreenCanvas: CanvasMessageType["offscreenCanvas"] | null = null;
-let videoFrames: FrameMessageType["videoFrames"] = [];
-let frameRate: FrameMessageType["frameRate"] | null = null;
-let estimatedServerTime: TimestampMessageType["estimatedServerTime"] | null =
-  null;
-let mainTimeOrigin: TimestampMessageType["mainTimeOrigin"] | null = null;
-let mainReceivedAt: TimestampMessageType["mainReceivedAt"] | null = null;
+let offscreenCanvas: CanvasMessage["offscreenCanvas"] | null = null;
+let videoFrames: FrameMessage["videoFrames"] = [];
+let frameRate: FrameMessage["frameRate"] | null = null;
+let estimatedServerTime: TimestampMessage["estimatedServerTime"] | null = null;
+let mainTimeOrigin: TimestampMessage["mainTimeOrigin"] | null = null;
+let mainReceivedAt: TimestampMessage["mainReceivedAt"] | null = null;
 let requestID: number | null = null;
 
 const sendMessage = (code: ResponseCodeEnum | ResponseCodeEnum) => {
-  const msg: ReseponseMessageType = { code };
+  const msg: ReseponseMessage = { code };
   self.postMessage(msg);
 };
 
@@ -103,7 +102,7 @@ const cleanUp = () => {
 
 self.onmessage = function (e) {
   console.log("Worker received!:", e.data);
-  const msg = e.data as WorkerMessageType;
+  const msg = e.data as WorkerMessage;
   switch (msg.type) {
     case "canvas":
       offscreenCanvas = msg.offscreenCanvas;

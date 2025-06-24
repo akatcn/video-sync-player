@@ -1,4 +1,4 @@
-import { WorkerMessageType } from "@/types/WorkerMessageType";
+import { WorkerMessage } from "@/types/WorkerMessage.type";
 import { useEffect, useRef, useState } from "react";
 
 type UseWorkerProps = {
@@ -21,7 +21,7 @@ const useWorker = ({ path, onmessage }: UseWorkerProps) => {
     }, 0);
 
     return () => {
-      const msg: WorkerMessageType = {
+      const msg: WorkerMessage = {
         type: "command",
         command: "close",
       };

@@ -1,8 +1,8 @@
 import {
-  FrameMessageType,
-  ReseponseMessageType,
-  WorkerMessageType,
-} from "@/types/WorkerMessageType";
+  FrameMessage,
+  ReseponseMessage,
+  WorkerMessage,
+} from "@/types/WorkerMessage.type";
 import useOffscreenCanvas from "@hooks/useOffscreenCanvas";
 import useWorker from "@hooks/useWorker";
 import { getVideoFrameInfo } from "@utils/mp4BoxUtils";
@@ -27,7 +27,7 @@ function VideoPlayer() {
   const { workerRef, isWorkerReady } = useWorker({
     path: PlayerWorker,
     onmessage: (e) => {
-      const msg = e.data as ReseponseMessageType;
+      const msg = e.data as ReseponseMessage;
       switch (msg.code) {
         case ResponseCodeEnum.VIDEO_PLAY:
           setCurrentPlayStatus(PlayStatusEnum.PLAY);
@@ -65,7 +65,7 @@ function VideoPlayer() {
   useSyncTime({ workerRef, isWorkerReady });
 
   const handlePlayClick = () => {
-    const msg: WorkerMessageType = {
+    const msg: WorkerMessage = {
       type: "command",
       command: currentPlayStatus === PlayStatusEnum.PLAY ? "stop" : "play",
     };
@@ -80,7 +80,7 @@ function VideoPlayer() {
     }
     // todo: demuxing 실패에 대한 핸들링
     const { videoFrames, frameRate } = await getVideoFrameInfo(file);
-    const msg: FrameMessageType = {
+    const msg: FrameMessage = {
       type: "frame",
       videoFrames,
       frameRate,

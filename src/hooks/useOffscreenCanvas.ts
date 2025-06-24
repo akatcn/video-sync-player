@@ -1,4 +1,4 @@
-import { CanvasMessageType } from "@/types/WorkerMessageType";
+import { CanvasMessage } from "@/types/WorkerMessage.type";
 import { RefObject, useEffect, useRef } from "react";
 
 type UseOffscreenProps = {
@@ -26,7 +26,7 @@ const useOffscreenCanvas = ({
     const offscreenCanvas = canvas.transferControlToOffscreen();
     prevOffscreenRef.current = offscreenCanvas;
 
-    const msg: CanvasMessageType = { type: "canvas", offscreenCanvas };
+    const msg: CanvasMessage = { type: "canvas", offscreenCanvas };
     worker.postMessage(msg, [offscreenCanvas]);
   }, [workerRef, canvasRef, isWorkerReady]); // isWorkerReady 추가
 };

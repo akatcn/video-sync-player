@@ -1,4 +1,4 @@
-import { WorkerMessageType } from "@/types/WorkerMessageType";
+import { WorkerMessage } from "@/types/WorkerMessage.type";
 import { RefObject, useEffect } from "react";
 
 type UseSyncTimeProps = {
@@ -40,7 +40,7 @@ const useSyncTime = ({ workerRef, isWorkerReady }: UseSyncTimeProps) => {
       }
       const { estimatedServerTime, timeOrigin, receivedAt } =
         await getServerTime();
-      const msg: WorkerMessageType = {
+      const msg: WorkerMessage = {
         type: "timestamp",
         estimatedServerTime,
         mainTimeOrigin: timeOrigin,

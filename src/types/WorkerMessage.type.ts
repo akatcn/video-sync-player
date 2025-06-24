@@ -1,34 +1,34 @@
 import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
 
-export type CanvasMessageType = {
+export type CanvasMessage = {
   type: "canvas";
   offscreenCanvas: OffscreenCanvas;
 };
 
-export type FrameMessageType = {
+export type FrameMessage = {
   type: "frame";
   videoFrames: VideoFrame[];
   frameRate: number;
 };
 
-export type TimestampMessageType = {
+export type TimestampMessage = {
   type: "timestamp";
   estimatedServerTime: number;
   mainTimeOrigin: number;
   mainReceivedAt: number;
 };
 
-export type CommandMessageType = {
+export type CommandMessage = {
   type: "command";
   command: "play" | "stop" | "clear" | "close";
 };
 
-export type WorkerMessageType =
-  | CanvasMessageType
-  | FrameMessageType
-  | TimestampMessageType
-  | CommandMessageType;
+export type WorkerMessage =
+  | CanvasMessage
+  | FrameMessage
+  | TimestampMessage
+  | CommandMessage;
 
-export type ReseponseMessageType = {
+export type ReseponseMessage = {
   code: ResponseCodeEnum | ResponseCodeEnum;
 };
