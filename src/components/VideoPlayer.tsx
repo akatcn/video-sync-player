@@ -1,95 +1,10 @@
-import {
-  FrameMessage,
-  ReseponseMessage,
-  WorkerMessage,
-} from "@/types/WorkerMessage.type";
-import useOffscreenCanvas from "@hooks/useOffscreenCanvas";
-import useWorker from "@hooks/useWorker";
-import { getVideoFrameInfo } from "@utils/mp4BoxUtils";
-import { ChangeEvent, useRef, useState } from "react";
-import { ResponseCodeEnum } from "@/constants/ResponseCodeEnum";
-import { PlayStatusEnum } from "@/constants/PlayStatusEnum";
-import PlayerWorker from "@/workers/playerWorker?worker&url";
-import useSyncTime from "@hooks/useSyncTime";
-import { Button } from "@components/ui/button";
+import { Ref } from "react";
 
-function VideoPlayer() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [currentPlayStatus, setCurrentPlayStatus] = useState<PlayStatusEnum>(
-    PlayStatusEnum.STOP,
-  );
-  const [isOffcanvasTransferred, setIsOffcanvasTransferred] = useState(false);
-  const [isVideoFrameInfoAcked, setIsVideoFrameInfoAcked] = useState(false);
-  const [isTimestampAcked, setIsTimestampAcked] = useState(false);
-  const isPlayable =
-    isOffcanvasTransferred && isVideoFrameInfoAcked && isTimestampAcked;
+type VideoPlayerProps = {
+  canvasRef: Ref<HTMLCanvasElement>;
+};
 
-  const { workerRef, isWorkerReady } = useWorker({
-    path: PlayerWorker,
-    onmessage: (e) => {
-      const msg = e.data as ReseponseMessage;
-      switch (msg.code) {
-        case ResponseCodeEnum.VIDEO_PLAY:
-          setCurrentPlayStatus(PlayStatusEnum.PLAY);
-          return;
-        case ResponseCodeEnum.VIDEO_STOP:
-          setCurrentPlayStatus(PlayStatusEnum.STOP);
-          return;
-        case ResponseCodeEnum.OFFCANVAS_ACKED:
-          setIsOffcanvasTransferred(true);
-          return;
-        case ResponseCodeEnum.FRAME_INFO_ACKED:
-          setIsVideoFrameInfoAcked(true);
-          return;
-        case ResponseCodeEnum.TIMESTAMP_ACKED:
-          setIsTimestampAcked(true);
-          return;
-      }
-      switch (msg.code) {
-        case ResponseCodeEnum.NO_CANVAS:
-          setIsOffcanvasTransferred(false);
-          alert("캔버스 찾을 수 없음");
-          return;
-        case ResponseCodeEnum.NO_FRAME_INFO:
-          setIsVideoFrameInfoAcked(false);
-          alert("프레임 정보 없음");
-          return;
-        case ResponseCodeEnum.NO_TIMESTAMP_INFO:
-          setIsTimestampAcked(false);
-          alert("시계 동기화 되지 않았음");
-          return;
-      }
-    },
-  });
-  useOffscreenCanvas({ canvasRef, workerRef, isWorkerReady });
-  useSyncTime({ workerRef, isWorkerReady });
-
-  const handlePlayClick = () => {
-    const msg: WorkerMessage = {
-      type: "command",
-      command: currentPlayStatus === PlayStatusEnum.PLAY ? "stop" : "play",
-    };
-    workerRef.current?.postMessage(msg);
-  };
-
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    const worker = workerRef.current;
-    if (!file || !worker) {
-      return;
-    }
-    // todo: demuxing 실패에 대한 핸들링
-    const { videoFrames, frameRate } = await getVideoFrameInfo(file);
-    const msg: FrameMessage = {
-      type: "frame",
-      videoFrames,
-      frameRate,
-    };
-    // todo: videoFrames를 deep clone 하지않고 그대로 transfer하는 방법을 고민할 것
-    worker.postMessage(msg);
-    videoFrames.forEach((videoFrame) => videoFrame.close()); // todo: videoFrames를 transfer할 경우 여기서 close하면 안될 것으로 예상된다
-  };
-
+function VideoPlayer({ canvasRef }: VideoPlayerProps) {
   return (
     <div className="w-full flex">
       <canvas ref={canvasRef} className="bg-black w-full h-full rounded-2xl" />
@@ -98,8 +13,3 @@ function VideoPlayer() {
 }
 
 export default VideoPlayer;
-
-/* <Button onClick={handlePlayClick} disabled={!isPlayable}>
-    {currentPlayStatus === PlayStatusEnum.PLAY ? "STOP" : "PLAY"}
-  </Button>
-  <input type="file" accept="video/mp4" onChange={handleFileChange} /> */

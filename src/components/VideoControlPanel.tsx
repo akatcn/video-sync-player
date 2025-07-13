@@ -1,8 +1,28 @@
+import { PlayStatusEnum } from "@/constants/PlayStatusEnum";
 import { Button } from "@components/ui/button";
 import { Switch } from "@components/ui/switch";
-import { FastForward, Play, Rewind, RotateCw, Upload } from "lucide-react";
+import {
+  FastForward,
+  Pause,
+  Play,
+  Rewind,
+  RotateCw,
+  Upload,
+} from "lucide-react";
 
-function VideoControlPanel() {
+type VideoControlPanelProps = {
+  isPlayable: boolean;
+  currentPlayStatus: PlayStatusEnum;
+  onPlayClick: () => void;
+  onFileChange: (file: File) => void;
+};
+
+function VideoControlPanel({
+  isPlayable,
+  currentPlayStatus,
+  onPlayClick,
+  onFileChange,
+}: VideoControlPanelProps) {
   return (
     <section className="flex flex-col justify-between ">
       <div>
@@ -22,20 +42,33 @@ function VideoControlPanel() {
         </div>
       </div>
       <div className="flex flex-col gap-y-4">
-        <Button size="xl">
-          <Upload />
+        <input
+          id="file-input"
+          className="hidden"
+          type="file"
+          accept="video/mp4"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            onFileChange(file);
+          }}
+        />
+        <Button asChild size="xl" className="w-full">
+          <label htmlFor="file-input">
+            <Upload />
+          </label>
         </Button>
-        <Button size="xl">
-          <Play />
+        <Button size="xl" disabled={!isPlayable} onClick={onPlayClick}>
+          {currentPlayStatus === PlayStatusEnum.PLAY ? <Pause /> : <Play />}
         </Button>
         <div className="flex gap-x-4">
-          <Button className="flex-1" size="xl">
+          <Button className="flex-1" size="xl" disabled={!isPlayable}>
             <Rewind />
           </Button>
-          <Button className="flex-1" size="xl">
+          <Button className="flex-1" size="xl" disabled={!isPlayable}>
             <RotateCw />
           </Button>
-          <Button className="flex-1" size="xl">
+          <Button className="flex-1" size="xl" disabled={!isPlayable}>
             <FastForward />
           </Button>
         </div>
