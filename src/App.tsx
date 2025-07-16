@@ -23,7 +23,7 @@ function App() {
     PlayStatusEnum.STOP,
   );
   const [isOffcanvasTransferred, setIsOffcanvasTransferred] = useState(false);
-  const [isVideoFrameInfoAcked, setIsVideoFrameInfoAcked] = useState(false);
+  const [isVideoFramesAcked, setIsVideoFramesAcked] = useState(false);
   const [isTimestampAcked, setIsTimestampAcked] = useState(false);
 
   const { workerRef, isWorkerReady } = useWorker({
@@ -41,7 +41,7 @@ function App() {
           setIsOffcanvasTransferred(true);
           break;
         case ResponseCodeEnum.FRAME_INFO_ACKED:
-          setIsVideoFrameInfoAcked(true);
+          setIsVideoFramesAcked(true);
           break;
         case ResponseCodeEnum.TIMESTAMP_ACKED:
           setIsTimestampAcked(true);
@@ -51,7 +51,7 @@ function App() {
           alert("캔버스 찾을 수 없음");
           break;
         case ResponseCodeEnum.NO_FRAME_INFO:
-          setIsVideoFrameInfoAcked(false);
+          setIsVideoFramesAcked(false);
           alert("프레임 정보 없음");
           break;
         case ResponseCodeEnum.NO_TIMESTAMP_INFO:
@@ -94,12 +94,13 @@ function App() {
       <main className="flex flex-col h-full">
         <GlobalNavigation />
         <div className="flex-1 px-6 pt-6 flex gap-x-6">
-          <VideoPlayer canvasRef={canvasRef} />
+          <VideoPlayer
+            canvasRef={canvasRef}
+            isVideoFramesAcked={isVideoFramesAcked}
+          />
           <VideoControlPanel
             isPlayable={
-              isOffcanvasTransferred &&
-              isVideoFrameInfoAcked &&
-              isTimestampAcked
+              isOffcanvasTransferred && isVideoFramesAcked && isTimestampAcked
             }
             currentPlayStatus={currentPlayStatus}
             onPlayClick={playVideo}
